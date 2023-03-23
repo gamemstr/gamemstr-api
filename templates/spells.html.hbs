@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>spells</title>
+    </head>
+    <body>
+        <section id = "hello">
+            <h1>spells</h1>
+            {{#each spells as |spell|}}
+            <ul>
+                <li>ID: {{spell.id}}</li>
+                <li>Name: {{spell.name}}</li>
+                <li>Description: {{spell.description}}</li>
+                <li>Level: {{spell.level}}</li>
+                <li>Casting Time: {{spell.casting_time}}</li>
+                <li>Duration: {{spell.duration}}</li>
+                <li>Damage: {{spell.damage}}</li>
+                <li>Range: {{spell.range}}</li>
+                <li>area: {{spell.area}}</li>
+                <li>Damage Type: {{spell.damage_type}}</li>
+                <li>Components: {{spell.components}}</li>
+                <li>Attack Bonus: {{spell.attack_bonus}}</li>
+                <li>Save: {{spell.save}}</li>
+            </ul>
+            {{/each}}
+        </section>
+    </body>
+</html>

@@ -1,4 +1,5 @@
 pub mod items;
+pub mod spells;
 pub mod worlds;
 
 pub trait Model {

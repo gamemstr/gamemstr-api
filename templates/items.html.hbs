@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Items</title>
+    </head>
+    <body>
+        <section id = "hello">
+            <h1>Items</h1>
+            {{#each items as |item|}}
+            <ul>
+                <li>ID: {{item.id}}</li>
+                <li>Name: {{item.name}}</li>
+                <li>Type: {{item.item_type}}</li>
+                <li>Rarity: {{item.rarity}}</li>
+                <li>Attunement: {{item.attunement}}</li>
+                <li>Weapon Type: {{item.weapon_type}}</li>
+                <li>Armor Type: {{item.armor_type}}</li>
+                <li>Conditions: {{item.conditions}}</li>
+                <li>Attached Spell: {{item.attached_spell}}</li>
+                <li>Has Charges: {{item.has_charges}}</li>
+                <li>Inventory: {{item.inventory}}</li>
+                <li>Other: {{item.other}}</li>
+                <li>Actions: {{item.actions}}</li>
+            </ul>
+            {{/each}}
+        </section>
+    </body>
+</html>

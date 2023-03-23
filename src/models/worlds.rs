@@ -1,21 +1,18 @@
-use crate::schema::worlds;
-use diesel;
 use diesel::prelude::*;
-use gamemstr_common::world::World;
 use serde::{Deserialize, Serialize};
 
-use super::Model;
+use crate::schema::worlds;
 
-#[derive(Queryable, Insertable, AsChangeset, Serialize, Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = worlds)]
-pub struct WorldModel {
+pub struct World {
     pub id: String,
     pub name: String,
     pub description: String,
 }
 
-impl Model for WorldModel {
-    type Entity = World;
+impl super::Model for World {
+    type Entity = gamemstr_common::world::World;
 
     fn new(entity: Self::Entity) -> Self {
         Self {
