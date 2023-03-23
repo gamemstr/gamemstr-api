@@ -1,6 +1,33 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    creatures (id) {
+        id -> Varchar,
+        name -> Varchar,
+        creature_type -> Jsonb,
+        alignment -> Jsonb,
+        armor_class -> Int4,
+        health_points -> Jsonb,
+        speed -> Jsonb,
+        stats -> Jsonb,
+        saving_throws -> Nullable<Jsonb>,
+        damage_resistances -> Nullable<Jsonb>,
+        damage_immunities -> Nullable<Jsonb>,
+        damage_vulnerabilities -> Nullable<Jsonb>,
+        condition_immunities -> Nullable<Jsonb>,
+        skills -> Nullable<Jsonb>,
+        senses -> Nullable<Jsonb>,
+        languages -> Nullable<Jsonb>,
+        challenge_rating -> Jsonb,
+        racial_traits -> Nullable<Jsonb>,
+        description -> Nullable<Varchar>,
+        actions -> Nullable<Jsonb>,
+        lair -> Nullable<Jsonb>,
+        others -> Nullable<Jsonb>,
+    }
+}
+
+diesel::table! {
     items (id) {
         id -> Varchar,
         name -> Varchar,
@@ -45,6 +72,7 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
+    creatures,
     items,
     spells,
     worlds,
