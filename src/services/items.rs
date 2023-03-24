@@ -5,8 +5,8 @@ use crate::{
 };
 use diesel::prelude::*;
 use gamemstr_common::item::Item;
-use rocket::serde::json::Json;
 use rocket::response::status::Created;
+use rocket::serde::json::Json;
 use rocket::{delete, get, post};
 use rocket_dyn_templates::{context, Template};
 
@@ -55,10 +55,9 @@ pub fn delete_item(id: String) -> Result<Json<Item>> {
 
 #[post("/items/add", format = "json", data = "<item>")]
 pub fn create_item(item: Json<Item>) -> Result<Created<Json<Item>>> {
-    use models::items::Item;
     let connection = &mut super::establish_connection_pg();
 
-    let new_item = Item::new(item.clone().0);
+    let new_item = models::items::Item::new(item.clone().0);
 
     diesel::insert_into(schema::items::dsl::items)
         .values(&new_item)

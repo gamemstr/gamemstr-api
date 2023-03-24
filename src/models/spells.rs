@@ -21,29 +21,31 @@ pub struct Spell {
     pub save: Option<serde_json::Value>,
 }
 
-impl Spell {
-    pub fn new(spell: gamemstr_common::spell::Spell) -> Self {
+impl super::Model for Spell {
+    type Entity = gamemstr_common::spell::Spell;
+
+    fn new(entity: Self::Entity) -> Self {
         Self {
-            id: spell.id,
-            name: spell.name,
-            description: spell.description,
-            level: serde_json::to_value(spell.level).unwrap(),
-            casting_time: serde_json::to_value(spell.casting_time).unwrap(),
-            duration: serde_json::to_value(spell.duration).unwrap(),
-            damage: spell.damage.map(|d| serde_json::to_value(d).unwrap()),
-            range: serde_json::to_value(spell.range).unwrap(),
-            area: spell.area.map(|a| serde_json::to_value(a).unwrap()),
-            damage_type: spell
+            id: entity.id,
+            name: entity.name,
+            description: entity.description,
+            level: serde_json::to_value(entity.level).unwrap(),
+            casting_time: serde_json::to_value(entity.casting_time).unwrap(),
+            duration: serde_json::to_value(entity.duration).unwrap(),
+            damage: entity.damage.map(|d| serde_json::to_value(d).unwrap()),
+            range: serde_json::to_value(entity.range).unwrap(),
+            area: entity.area.map(|a| serde_json::to_value(a).unwrap()),
+            damage_type: entity
                 .damage_type
                 .map(|dt| serde_json::to_value(dt).unwrap()),
-            components: serde_json::to_value(spell.components).unwrap(),
-            attack_bonus: spell.attack_bonus,
-            save: spell.save.map(|s| serde_json::to_value(s).unwrap()),
+            components: serde_json::to_value(entity.components).unwrap(),
+            attack_bonus: entity.attack_bonus,
+            save: entity.save.map(|s| serde_json::to_value(s).unwrap()),
         }
     }
 
-    pub fn to_entity(&self) -> gamemstr_common::spell::Spell {
-        gamemstr_common::spell::Spell {
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity {
             id: self.id.clone(),
             name: self.name.clone(),
             description: self.description.clone(),

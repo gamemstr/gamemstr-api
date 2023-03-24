@@ -1,5 +1,8 @@
 use super::Result;
-use crate::{models, schema};
+use crate::{
+    models::{self, Model},
+    schema,
+};
 use diesel::prelude::*;
 use gamemstr_common::spell::Spell;
 use rocket::response::status::Created;
@@ -9,10 +12,9 @@ use rocket_dyn_templates::{context, Template};
 
 #[get("/spells")]
 pub fn list_spells() -> Template {
-    use models::spells::Spell;
     let connection = &mut super::establish_connection_pg();
     let spells = schema::spells::dsl::spells
-        .load::<Spell>(connection)
+        .load::<models::spells::Spell>(connection)
         .expect("Error loading spells")
         .iter()
         .map(|spell| spell.to_entity())
@@ -28,11 +30,10 @@ pub fn list_spells() -> Template {
 
 #[get("/spells/<id>")]
 pub fn get_spell(id: String) -> Result<Json<Spell>> {
-    use models::spells::Spell;
     let connection = &mut super::establish_connection_pg();
     let spell = schema::spells::dsl::spells
         .find(id)
-        .first::<Spell>(connection)
+        .first::<models::spells::Spell>(connection)
         .expect("Error loading spell")
         .to_entity();
     Ok(Json(spell))
@@ -40,11 +41,10 @@ pub fn get_spell(id: String) -> Result<Json<Spell>> {
 
 #[delete("/spells/<id>")]
 pub fn delete_spell(id: String) -> Result<Json<Spell>> {
-    use models::spells::Spell;
     let connection = &mut super::establish_connection_pg();
     let spell = schema::spells::dsl::spells
         .find(&id)
-        .first::<Spell>(connection)
+        .first::<models::spells::Spell>(connection)
         .expect("Error loading spell")
         .to_entity();
     diesel::delete(schema::spells::dsl::spells.find(&id))
@@ -55,10 +55,9 @@ pub fn delete_spell(id: String) -> Result<Json<Spell>> {
 
 #[post("/spells/add", format = "json", data = "<spell>")]
 pub fn create_spell(spell: Json<Spell>) -> Result<Created<Json<Spell>>> {
-    use models::spells::Spell;
     let connection = &mut super::establish_connection_pg();
 
-    let new_spell = Spell::new(spell.clone().0);
+    let new_spell = models::spells::Spell::new(spell.clone().0);
 
     diesel::insert_into(schema::spells::dsl::spells)
         .values(&new_spell)

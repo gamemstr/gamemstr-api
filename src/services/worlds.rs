@@ -12,10 +12,9 @@ use rocket_dyn_templates::{context, Template};
 
 #[get("/worlds")]
 pub fn list_worlds() -> Template {
-    use models::worlds::World;
     let connection = &mut super::establish_connection_pg();
     let worlds = schema::worlds::dsl::worlds
-        .load::<World>(connection)
+        .load::<models::worlds::World>(connection)
         .expect("Error loading worlds")
         .iter()
         .map(|world| world.to_entity())
@@ -31,11 +30,10 @@ pub fn list_worlds() -> Template {
 
 #[get("/worlds/<id>")]
 pub fn get_world(id: String) -> Result<Json<World>> {
-    use models::worlds::World;
     let connection = &mut super::establish_connection_pg();
     let world = schema::worlds::dsl::worlds
         .find(id)
-        .first::<World>(connection)
+        .first::<models::worlds::World>(connection)
         .expect("Error loading world")
         .to_entity();
     Ok(Json(world))
@@ -43,11 +41,10 @@ pub fn get_world(id: String) -> Result<Json<World>> {
 
 #[delete("/worlds/<id>")]
 pub fn delete_world(id: String) -> Result<Json<World>> {
-    use models::worlds::World;
     let connection = &mut super::establish_connection_pg();
     let world = schema::worlds::dsl::worlds
         .find(&id)
-        .first::<World>(connection)
+        .first::<models::worlds::World>(connection)
         .expect("Error loading world")
         .to_entity();
     diesel::delete(schema::worlds::dsl::worlds.find(&id))
@@ -58,10 +55,9 @@ pub fn delete_world(id: String) -> Result<Json<World>> {
 
 #[post("/worlds/add", format = "json", data = "<world>")]
 pub fn create_world(world: Json<World>) -> Result<Created<Json<World>>> {
-    use models::worlds::World;
     let connection = &mut super::establish_connection_pg();
 
-    let new_world = World::new(world.clone().0);
+    let new_world = models::worlds::World::new(world.clone().0);
 
     diesel::insert_into(schema::worlds::dsl::worlds)
         .values(&new_world)
