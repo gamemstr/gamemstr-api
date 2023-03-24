@@ -24,5 +24,17 @@ jobs:
         profile: minimal
     - name: Build
       run: cargo build --verbose
+  test:
+  
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install latest nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        override: true
+        profile: minimal
     - name: Run tests
       run: cargo test --verbose
