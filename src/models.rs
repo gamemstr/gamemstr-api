@@ -1,3 +1,4 @@
+pub mod creatures;
 pub mod items;
 pub mod spells;
 pub mod worlds;
