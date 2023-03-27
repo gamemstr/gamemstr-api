@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Creatures</title>
+    </head>
+    <body>
+        <section id = "hello">
+            <h1>Creatures</h1>
+            {{#each creatures as |creature|}}
+            <ul>
+                <li>ID: {{creature.id}}</li>
+                <li>Name: {{creature.name}}</li>
+                <li>Alignment: {{creature.alignment}}</li>
+                <li>Armor Class: {{creature.armor_class}}</li>
+                <li>Health Points: {{creature.health_points}}</li>
+                <li>Speed: {{creature.speed}}</li>
+                <li>Stats: {{creature.stats}}</li>
+                <li>Saving Throws: {{creature.saving_throws}}</li>
+                <li>Damage Resistances: {{creature.damage_resistances}}</li>
+                <li>Damage Immunities: {{creature.damage_immunities}}</li>
+                <li>Damage Vulnerabilities: {{creature.damage_vulnerabilities}}</li>
+                <li>Condition Immunities: {{creature.condition_immunities}}</li>
+                <li>Skills: {{creature.skills}}</li>
+                <li>Senses: {{creature.senses}}</li>
+                <li>Languages: {{creature.languages}}</li>
+                <li>Challenge Rating: {{creature.challenge_rating}}</li>
+                <li>Racial Traits: {{creature.ratial_traits}}</li>
+                <li>Description: {{creature.description}}</li>
+                <li>Actions: {{creature.actions}}</li>
+                <li>Lair: {{creature.lair}}</li>
+                <li>Others: {{creature.others}}</li>
+            </ul>
+            {{/each}}
+        </section>
+    </body>
+</html>
