@@ -46,7 +46,9 @@ impl super::Model for Creature {
             saving_throws: Some(serde_json::to_value(entity.saving_throws).unwrap()),
             damage_resistances: Some(serde_json::to_value(entity.damage_resistances).unwrap()),
             damage_immunities: Some(serde_json::to_value(entity.damage_immunities).unwrap()),
-            damage_vulnerabilities: Some(serde_json::to_value(entity.damage_vulnerabilities).unwrap()),
+            damage_vulnerabilities: Some(
+                serde_json::to_value(entity.damage_vulnerabilities).unwrap(),
+            ),
             condition_immunities: Some(serde_json::to_value(entity.condition_immunities).unwrap()),
             skills: Some(serde_json::to_value(entity.skills).unwrap()),
             senses: Some(serde_json::to_value(entity.senses).unwrap()),
@@ -71,10 +73,18 @@ impl super::Model for Creature {
             speed: serde_json::from_value(self.speed.clone()).unwrap(),
             stats: serde_json::from_value(self.stats.clone()).unwrap(),
             saving_throws: serde_json::from_value(self.saving_throws.clone().unwrap()).unwrap(),
-            damage_resistances: serde_json::from_value(self.damage_resistances.clone().unwrap()).unwrap(),
-            damage_immunities: serde_json::from_value(self.damage_immunities.clone().unwrap()).unwrap(),
-            damage_vulnerabilities: serde_json::from_value(self.damage_vulnerabilities.clone().unwrap()).unwrap(),
-            condition_immunities: serde_json::from_value(self.condition_immunities.clone().unwrap()).unwrap(),
+            damage_resistances: serde_json::from_value(self.damage_resistances.clone().unwrap())
+                .unwrap(),
+            damage_immunities: serde_json::from_value(self.damage_immunities.clone().unwrap())
+                .unwrap(),
+            damage_vulnerabilities: serde_json::from_value(
+                self.damage_vulnerabilities.clone().unwrap(),
+            )
+            .unwrap(),
+            condition_immunities: serde_json::from_value(
+                self.condition_immunities.clone().unwrap(),
+            )
+            .unwrap(),
             skills: serde_json::from_value(self.skills.clone().unwrap()).unwrap(),
             senses: serde_json::from_value(self.senses.clone().unwrap()).unwrap(),
             languages: serde_json::from_value(self.languages.clone().unwrap()).unwrap(),
