@@ -38,6 +38,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+        - 5432:5432
     
     steps:
     - name: Checkout latest commit
@@ -50,6 +52,3 @@ jobs:
         profile: minimal
     - name: Run tests
       run: cargo test --verbose
-      env:
-        POSTGRES_HOST: postgres
-        POSTGRES_PORT: 5432
