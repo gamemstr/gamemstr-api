@@ -41,7 +41,7 @@ jobs:
     
     steps:
     - name: Checkout latest commit
-    - uses: actions/checkout@v3
+      uses: actions/checkout@v3
     - name: Install latest rust nightly
       uses: actions-rs/toolchain@v1
       with:
