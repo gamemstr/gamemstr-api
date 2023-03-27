@@ -25,3 +25,230 @@ fn rocket() -> _ {
         .mount("/", routes![services::worlds::list_worlds])
         .attach(Template::fairing())
 }
+
+#[cfg(test)]
+mod tests {
+    use gamemstr_common::{action, item, spell};
+    use rocket::{
+        http::{ContentType, Status},
+        local::blocking::Client,
+    };
+
+    #[test]
+    fn test_creatures_api() {
+        let client = Client::tracked(crate::rocket()).expect("valid rocket instance");
+        let response = client.get("/creatures").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert!(response.into_string().unwrap().contains("Creatures"));
+        let creature = gamemstr_common::creature::Creature {
+            id: "258759802792856926525".to_string(),
+            name: "Test Creature".to_string(),
+            creature_type: gamemstr_common::creature::CreatureType::NPC,
+            alignment: gamemstr_common::Alignment::ChaoticGood,
+            armor_class: 10,
+            health_points: gamemstr_common::creature::Health {
+                health: gamemstr_common::DieStat {
+                    die_count: 3,
+                    die_type: gamemstr_common::Die::D6,
+                    extra: 4,
+                },
+            },
+            speed: gamemstr_common::creature::MovementSpeed::Walk(30),
+            stats: vec![
+                gamemstr_common::creature::Stat {
+                    stat_type: gamemstr_common::creature::StatType::Strength,
+                    value: 10,
+                    modifier: 0,
+                },
+                gamemstr_common::creature::Stat {
+                    stat_type: gamemstr_common::creature::StatType::Dexterity,
+                    value: 10,
+                    modifier: 0,
+                },
+                gamemstr_common::creature::Stat {
+                    stat_type: gamemstr_common::creature::StatType::Constitution,
+                    value: 10,
+                    modifier: 0,
+                },
+                gamemstr_common::creature::Stat {
+                    stat_type: gamemstr_common::creature::StatType::Intelligence,
+                    value: 10,
+                    modifier: 0,
+                },
+                gamemstr_common::creature::Stat {
+                    stat_type: gamemstr_common::creature::StatType::Wisdom,
+                    value: 10,
+                    modifier: 0,
+                },
+                gamemstr_common::creature::Stat {
+                    stat_type: gamemstr_common::creature::StatType::Charisma,
+                    value: 10,
+                    modifier: 0,
+                },
+            ],
+            saving_throws: None,
+            damage_vulnerabilities: None,
+            damage_resistances: None,
+            damage_immunities: None,
+            condition_immunities: None,
+            skills: None,
+            senses: None,
+            languages: None,
+            challenge_rating: "1".into(),
+            racial_traits: None,
+            description: None,
+            actions: Some(vec![action::Action::new(action::ActionType::Attack(
+                action::attack::Attack::MeleeWeaponAttack(action::attack::Melee {
+                    name: "Test Attack".to_string(),
+                    modifier: 3,
+                    reach: Some(10),
+                    target_type: action::attack::TargetType::OneTarget,
+                    damage: gamemstr_common::DieStat {
+                        die_count: 3,
+                        die_type: gamemstr_common::Die::D6,
+                        extra: 4,
+                    },
+                    damage_type: gamemstr_common::DamageType::Slashing,
+                    description: "Test Description".to_string(),
+                }),
+            ))]),
+            lair: None,
+            others: None,
+        };
+        let response = client
+            .post("/creatures/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&creature).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Created);
+        let response = client.get("/creatures/258759802792856926525").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert!(response.into_string().unwrap().contains("Test Creature"));
+        let response = client.delete("/creatures/258759802792856926525").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+    }
+
+    #[test]
+    fn test_items_api() {
+        let client = Client::tracked(crate::rocket()).expect("valid rocket instance");
+        let response = client.get("/items").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert!(response.into_string().unwrap().contains("Items"));
+        let item = gamemstr_common::item::Item {
+            id: "258759802792856926525".to_string(),
+            name: "Test Item".to_string(),
+            item_type: item::ItemType::Weapon,
+            rarity: item::ItemRarity::Common,
+            attunement: Some(item::Attuneable {
+                alignments: Some(vec![gamemstr_common::Alignment::ChaoticGood]),
+            }),
+            weapon_type: Some(item::WeaponType::Sword),
+            armor_type: None,
+            conditions: Some(vec![gamemstr_common::ConditionType::Blinded]),
+            attached_spell: None,
+            has_charges: Some(item::Charge {
+                num: 5,
+                time: item::TimeDivision::Day,
+            }),
+            inventory: None,
+            others: None,
+            actions: Some(vec![action::Action::new(action::ActionType::Attack(
+                action::attack::Attack::MeleeWeaponAttack(action::attack::Melee {
+                    name: "Test Attack".to_string(),
+                    modifier: 3,
+                    reach: Some(10),
+                    target_type: action::attack::TargetType::OneTarget,
+                    damage: gamemstr_common::DieStat {
+                        die_count: 3,
+                        die_type: gamemstr_common::Die::D6,
+                        extra: 4,
+                    },
+                    damage_type: gamemstr_common::DamageType::Slashing,
+                    description: "Test Description".to_string(),
+                }),
+            ))]),
+        };
+        let response = client
+            .post("/items/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&item).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Created);
+        let response = client.get("/items/258759802792856926525").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert_eq!(
+            response.into_string(),
+            Some(serde_json::to_string(&item).unwrap())
+        );
+        let response = client.delete("/items/258759802792856926525").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+    }
+
+    #[test]
+    fn test_spells_api() {
+        let client = Client::tracked(crate::rocket()).expect("valid rocket instance");
+        let response = client.get("/spells").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert!(response.into_string().unwrap().contains("Spells"));
+        let spell = gamemstr_common::spell::Spell {
+            id: "258759802792856926525".to_string(),
+            name: "Test Spell".to_string(),
+            description: "Test Description".to_string(),
+            level: spell::SpellLevel::Cantrip,
+            casting_time: spell::CastingTime::Action,
+            duration: spell::Duration::Concentration,
+            damage: Some(gamemstr_common::DieStat {
+                die_count: 5,
+                die_type: gamemstr_common::Die::D6,
+                extra: 2,
+            }),
+            range: spell::SpellRange::Touch,
+            area: Some(spell::Area::Cone(10)),
+            damage_type: Some(gamemstr_common::DamageType::Slashing),
+            components: spell::Components::VS,
+            attack_bonus: Some(4),
+            save: Some(spell::Save::Dexterity(Some(13))),
+        };
+        let response = client
+            .post("/spells/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&spell).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Created);
+        let response = client.get("/spells/258759802792856926525").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert_eq!(
+            response.into_string(),
+            Some(serde_json::to_string(&spell).unwrap())
+        );
+        let response = client.delete("/spells/258759802792856926525").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+    }
+
+    #[test]
+    fn test_worlds_api() {
+        let client = Client::tracked(crate::rocket()).expect("valid rocket instance");
+        let response = client.get("/worlds").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert!(response.into_string().unwrap().contains("Worlds"));
+        let world = gamemstr_common::world::World {
+            id: "258759802792856926525".to_string(),
+            name: "Test World".to_string(),
+            description: "Test Description".to_string(),
+        };
+        let response = client
+            .post("/worlds/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&world).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Created);
+        let response = client.get("/worlds/258759802792856926525").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert_eq!(
+            response.into_string(),
+            Some(serde_json::to_string(&world).unwrap())
+        );
+        let response = client.delete("/worlds/258759802792856926525").dispatch();
+        assert_eq!(response.status(), Status::Ok);
+    }
+}
