@@ -138,9 +138,11 @@ mod tests {
             .dispatch();
         assert_eq!(response.status(), Status::Accepted);
         assert_eq!(
-            serde_json::from_str::<gamemstr_common::creature::Creature>(&response.into_string().unwrap())
-                .unwrap()
-                .name,
+            serde_json::from_str::<gamemstr_common::creature::Creature>(
+                &response.into_string().unwrap()
+            )
+            .unwrap()
+            .name,
             "Updated Creature"
         );
         let response = client.delete("/creatures/258759802792856926525").dispatch();

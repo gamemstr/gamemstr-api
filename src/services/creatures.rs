@@ -5,9 +5,12 @@ use crate::{
 };
 use diesel::prelude::*;
 use gamemstr_common::creature::Creature;
-use rocket::{response::status::{Created, Accepted, NotFound}, Either};
 use rocket::serde::json::Json;
 use rocket::{delete, get, post};
+use rocket::{
+    response::status::{Accepted, Created, NotFound},
+    Either,
+};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/creatures")]
@@ -66,7 +69,10 @@ pub fn create_creature(creature: Json<Creature>) -> Result<Created<Json<Creature
 }
 
 #[post("/creatures/<id>", format = "json", data = "<creature>")]
-pub fn update_creature(id: String, creature: Json<Creature>) -> Either<Result<Accepted<Json<Creature>>>, Result<NotFound<String>>> {
+pub fn update_creature(
+    id: String,
+    creature: Json<Creature>,
+) -> Either<Result<Accepted<Json<Creature>>>, Result<NotFound<String>>> {
     let connection = &mut super::establish_connection_pg();
     let result = diesel::update(schema::creatures::dsl::creatures.find(&id))
         .set(&models::creatures::Creature::new(creature.clone().0))
