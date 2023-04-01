@@ -127,6 +127,22 @@ mod tests {
         let response = client.get("/creatures/258759802792856926525").dispatch();
         assert_eq!(response.status(), Status::Ok);
         assert!(response.into_string().unwrap().contains("Test Creature"));
+        let new_creature = gamemstr_common::creature::Creature {
+            name: "Updated Creature".to_string(),
+            ..creature
+        };
+        let response = client
+            .post("/creatures/258759802792856926525")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&new_creature).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Accepted);
+        assert_eq!(
+            serde_json::from_str::<gamemstr_common::creature::Creature>(&response.into_string().unwrap())
+                .unwrap()
+                .name,
+            "Updated Creature"
+        );
         let response = client.delete("/creatures/258759802792856926525").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
