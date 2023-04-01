@@ -239,6 +239,22 @@ mod tests {
             response.into_string(),
             Some(serde_json::to_string(&spell).unwrap())
         );
+        let new_spell = gamemstr_common::spell::Spell {
+            name: "Updated Spell".to_string(),
+            ..spell
+        };
+        let response = client
+            .post("/spells/258759802792856926525")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&new_spell).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Accepted);
+        assert_eq!(
+            serde_json::from_str::<gamemstr_common::spell::Spell>(&response.into_string().unwrap())
+                .unwrap()
+                .name,
+            "Updated Spell"
+        );
         let response = client.delete("/spells/258759802792856926525").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
