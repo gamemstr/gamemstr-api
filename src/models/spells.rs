@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::schema::spells;
 
-#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable, AsChangeset)]
 #[diesel(table_name = spells)]
 pub struct Spell {
     pub id: String,

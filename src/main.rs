@@ -20,6 +20,7 @@ fn rocket() -> _ {
         .mount("/", routes![services::spells::get_spell])
         .mount("/", routes![services::spells::delete_spell])
         .mount("/", routes![services::spells::create_spell])
+        .mount("/", routes![services::spells::update_spell])
         .mount("/", routes![services::worlds::create_world])
         .mount("/", routes![services::worlds::get_world])
         .mount("/", routes![services::worlds::delete_world])
