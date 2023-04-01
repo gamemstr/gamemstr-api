@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::schema::items;
 
-#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable, AsChangeset)]
 #[diesel(table_name = items)]
 pub struct Item {
     pub id: String,

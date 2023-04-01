@@ -15,6 +15,7 @@ fn rocket() -> _ {
         .mount("/", routes![services::items::get_item])
         .mount("/", routes![services::items::delete_item])
         .mount("/", routes![services::items::create_item])
+        .mount("/", routes![services::items::update_item])
         .mount("/", routes![services::spells::list_spells])
         .mount("/", routes![services::spells::get_spell])
         .mount("/", routes![services::spells::delete_spell])
