@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::schema::creatures;
 
-#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable, AsChangeset)]
 #[diesel(table_name = creatures)]
 pub struct Creature {
     pub id: String,
