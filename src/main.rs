@@ -283,6 +283,22 @@ mod tests {
             response.into_string(),
             Some(serde_json::to_string(&world).unwrap())
         );
+        let new_world = gamemstr_common::world::World {
+            name: "Updated World".to_string(),
+            ..world
+        };
+        let response = client
+            .post("/worlds/258759802792856926525")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&new_world).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Accepted);
+        assert_eq!(
+            serde_json::from_str::<gamemstr_common::world::World>(&response.into_string().unwrap())
+                .unwrap()
+                .name,
+            "Updated World"
+        );
         let response = client.delete("/worlds/258759802792856926525").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }
