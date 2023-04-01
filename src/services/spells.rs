@@ -5,9 +5,12 @@ use crate::{
 };
 use diesel::prelude::*;
 use gamemstr_common::spell::Spell;
-use rocket::{response::status::{Created, Accepted, NotFound}, Either};
 use rocket::serde::json::Json;
 use rocket::{delete, get, post};
+use rocket::{
+    response::status::{Accepted, Created, NotFound},
+    Either,
+};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/spells")]
@@ -67,13 +70,16 @@ pub fn create_spell(spell: Json<Spell>) -> Result<Created<Json<Spell>>> {
 }
 
 #[post("/spells/<id>", format = "json", data = "<spell>")]
-pub fn update_spell(id: String, spell: Json<Spell>) -> Either<Result<Accepted<Json<Spell>>>, Result<NotFound<String>>> {
+pub fn update_spell(
+    id: String,
+    spell: Json<Spell>,
+) -> Either<Result<Accepted<Json<Spell>>>, Result<NotFound<String>>> {
     let connection = &mut super::establish_connection_pg();
     let result = diesel::update(schema::spells::dsl::spells.find(&id))
         .set(models::spells::Spell::new(spell.clone().0))
         .execute(connection);
     match result {
         Ok(_) => Either::Left(Ok(Accepted(Some(spell)))),
-        Err(_) => Either::Right(Ok(NotFound(id))),
+        Err(_) => Either::Right(Ok(NotFound(format!("No spell with id {}", id)))),
     }
 }

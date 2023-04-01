@@ -75,16 +75,11 @@ pub fn update_item(
     item: Json<Item>,
 ) -> Either<Result<Accepted<Json<Item>>>, Result<NotFound<String>>> {
     let connection = &mut super::establish_connection_pg();
-    if schema::items::dsl::items
-        .find(&id)
-        .first::<models::items::Item>(connection)
-        .is_err()
-    {
-        return Either::Right(Ok(NotFound(id)));
-    }
-    diesel::update(schema::items::dsl::items.find(&id))
+    let result = diesel::update(schema::items::dsl::items.find(&id))
         .set(models::items::Item::new(item.clone().0))
-        .execute(connection)
-        .expect("Error updating item");
-    Either::Left(Ok(Accepted(Some(item))))
+        .execute(connection);
+    match result {
+        Ok(_) => Either::Left(Ok(Accepted(Some(item)))),
+        Err(_) => Either::Right(Ok(NotFound(format!("No item with id {}", id)))),
+    }
 }
