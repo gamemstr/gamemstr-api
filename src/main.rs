@@ -20,6 +20,7 @@ fn rocket() -> _ {
         .mount("/", routes![services::spells::get_spell])
         .mount("/", routes![services::spells::delete_spell])
         .mount("/", routes![services::spells::create_spell])
+        .mount("/", routes![services::spells::update_spell])
         .mount("/", routes![services::worlds::create_world])
         .mount("/", routes![services::worlds::get_world])
         .mount("/", routes![services::worlds::delete_world])
@@ -237,6 +238,22 @@ mod tests {
         assert_eq!(
             response.into_string(),
             Some(serde_json::to_string(&spell).unwrap())
+        );
+        let new_spell = gamemstr_common::spell::Spell {
+            name: "Updated Spell".to_string(),
+            ..spell
+        };
+        let response = client
+            .post("/spells/258759802792856926525")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&new_spell).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Accepted);
+        assert_eq!(
+            serde_json::from_str::<gamemstr_common::spell::Spell>(&response.into_string().unwrap())
+                .unwrap()
+                .name,
+            "Updated Spell"
         );
         let response = client.delete("/spells/258759802792856926525").dispatch();
         assert_eq!(response.status(), Status::Ok);
