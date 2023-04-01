@@ -50,5 +50,7 @@ jobs:
         toolchain: nightly
         override: true
         profile: minimal
+    - name: Diesel Migrations
+      run: cargo install diesel_cli --no-default-features -F postgres && diesel migration run
     - name: Run tests
       run: cargo test --verbose
