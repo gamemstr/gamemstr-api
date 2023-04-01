@@ -181,6 +181,22 @@ mod tests {
             response.into_string(),
             Some(serde_json::to_string(&item).unwrap())
         );
+        let new_item = gamemstr_common::item::Item {
+            name: "Updated Item".to_string(),
+            ..item
+        };
+        let response = client
+            .post("/items/258759802792856926525")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&new_item).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Accepted);
+        assert_eq!(
+            serde_json::from_str::<gamemstr_common::item::Item>(&response.into_string().unwrap())
+                .unwrap()
+                .name,
+            "Updated Item"
+        );
         let response = client.delete("/items/258759802792856926525").dispatch();
         assert_eq!(response.status(), Status::Ok);
     }

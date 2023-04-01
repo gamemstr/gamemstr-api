@@ -5,9 +5,12 @@ use crate::{
 };
 use diesel::prelude::*;
 use gamemstr_common::item::Item;
-use rocket::{response::status::{Created, Accepted, NotFound}, Either};
 use rocket::serde::json::Json;
 use rocket::{delete, get, post};
+use rocket::{
+    response::status::{Accepted, Created, NotFound},
+    Either,
+};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/items")]
@@ -67,13 +70,18 @@ pub fn create_item(item: Json<Item>) -> Result<Created<Json<Item>>> {
 }
 
 #[post("/items/<id>", format = "json", data = "<item>")]
-pub fn update_item(id: String, item: Json<Item>) -> Either<Result<Accepted<Json<Item>>>, Result<NotFound<String>>> {
+pub fn update_item(
+    id: String,
+    item: Json<Item>,
+) -> Either<Result<Accepted<Json<Item>>>, Result<NotFound<String>>> {
     let connection = &mut super::establish_connection_pg();
     if schema::items::dsl::items
         .find(&id)
-        .first::<models::items::Item>(connection).is_err() {
-            return Either::Right(Ok(NotFound(id)));
-        }
+        .first::<models::items::Item>(connection)
+        .is_err()
+    {
+        return Either::Right(Ok(NotFound(id)));
+    }
     diesel::update(schema::items::dsl::items.find(&id))
         .set(models::items::Item::new(item.clone().0))
         .execute(connection)
