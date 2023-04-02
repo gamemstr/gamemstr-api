@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::schema::worlds;
 
-#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable, AsChangeset)]
 #[diesel(table_name = worlds)]
 pub struct World {
     pub id: String,

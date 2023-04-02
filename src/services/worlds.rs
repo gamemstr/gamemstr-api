@@ -5,9 +5,12 @@ use crate::{
 };
 use diesel::prelude::*;
 use gamemstr_common::world::World;
-use rocket::response::status::Created;
 use rocket::serde::json::Json;
 use rocket::{delete, get, post};
+use rocket::{
+    response::status::{Accepted, Created, NotFound},
+    Either,
+};
 use rocket_dyn_templates::{context, Template};
 
 #[get("/worlds")]
@@ -64,4 +67,19 @@ pub fn create_world(world: Json<World>) -> Result<Created<Json<World>>> {
         .execute(connection)
         .expect("Error saving new world");
     Ok(Created::new("/").body(world))
+}
+
+#[post("/worlds/<id>", format = "json", data = "<world>")]
+pub fn update_world(
+    id: String,
+    world: Json<World>,
+) -> Either<Result<Accepted<Json<World>>>, Result<NotFound<String>>> {
+    let connection = &mut super::establish_connection_pg();
+    let result = diesel::update(schema::worlds::dsl::worlds.find(&id))
+        .set(models::worlds::World::new(world.clone().0))
+        .execute(connection);
+    match result {
+        Ok(_) => Either::Left(Ok(Accepted(Some(world)))),
+        Err(_) => Either::Right(Ok(NotFound(id))),
+    }
 }
