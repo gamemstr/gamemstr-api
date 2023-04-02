@@ -13,6 +13,8 @@ use rocket::{
 };
 use rocket_dyn_templates::{context, Template};
 
+pub mod locations;
+
 #[get("/worlds")]
 pub fn list_worlds() -> Template {
     let connection = &mut super::establish_connection_pg();
