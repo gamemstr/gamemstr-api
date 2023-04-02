@@ -318,11 +318,14 @@ mod tests {
             name: "Test World".to_string(),
             description: "Test Description".to_string(),
         };
-        client.post("/worlds/add")
+        client
+            .post("/worlds/add")
             .header(ContentType::JSON)
             .body(serde_json::to_string(&world).unwrap())
             .dispatch();
-        let response = client.get("/worlds/2587598027928569265/locations").dispatch();
+        let response = client
+            .get("/worlds/2587598027928569265/locations")
+            .dispatch();
         assert_eq!(response.status(), Status::Ok);
         assert!(response.into_string().unwrap().contains("Locations"));
         let location = gamemstr_common::world::location::Location {
@@ -343,7 +346,9 @@ mod tests {
             .body(serde_json::to_string(&location).unwrap())
             .dispatch();
         assert_eq!(response.status(), Status::Created);
-        let response = client.get("/worlds/2587598027928569265/locations/258759802792856926525").dispatch();
+        let response = client
+            .get("/worlds/2587598027928569265/locations/258759802792856926525")
+            .dispatch();
         assert_eq!(response.status(), Status::Ok);
         assert_eq!(
             response.into_string(),
@@ -360,12 +365,16 @@ mod tests {
             .dispatch();
         assert_eq!(response.status(), Status::Accepted);
         assert_eq!(
-            serde_json::from_str::<gamemstr_common::world::location::Location>(&response.into_string().unwrap())
-                .unwrap()
-                .name,
+            serde_json::from_str::<gamemstr_common::world::location::Location>(
+                &response.into_string().unwrap()
+            )
+            .unwrap()
+            .name,
             "Updated Location"
         );
-        let response = client.delete("/worlds/2587598027928569265/locations/258759802792856926525").dispatch();
+        let response = client
+            .delete("/worlds/2587598027928569265/locations/258759802792856926525")
+            .dispatch();
         assert_eq!(response.status(), Status::Ok);
         client.delete("/worlds/2587598027928569265").dispatch();
     }

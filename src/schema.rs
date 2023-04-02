@@ -82,10 +82,4 @@ diesel::table! {
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(
-    creatures,
-    items,
-    locations,
-    spells,
-    worlds,
-);
+diesel::allow_tables_to_appear_in_same_query!(creatures, items, locations, spells, worlds,);
