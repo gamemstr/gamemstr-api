@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::schema::locations;
 
-#[derive(Debug, Serialize, Deserialize, Queryable, Identifiable, AsChangeset)]
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable, AsChangeset)]
 #[diesel(table_name = locations)]
 pub struct Location {
     pub id: String,
