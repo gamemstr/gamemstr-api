@@ -59,6 +59,7 @@ pub fn delete_location(_world_id: String, id: String) -> Result<Json<Location>> 
 
 #[post(
     "/worlds/<_world_id>/locations/add",
+    rank = 1,
     format = "json",
     data = "<location>"
 )]
@@ -77,6 +78,7 @@ pub fn create_location(
 
 #[post(
     "/worlds/<_world_id>/locations/<id>",
+    rank = 2,
     format = "json",
     data = "<location>"
 )]
