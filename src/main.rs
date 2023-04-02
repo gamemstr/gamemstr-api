@@ -26,6 +26,11 @@ fn rocket() -> _ {
         .mount("/", routes![services::worlds::get_world])
         .mount("/", routes![services::worlds::delete_world])
         .mount("/", routes![services::worlds::list_worlds])
+        .mount("/", routes![services::worlds::locations::list_locations])
+        .mount("/", routes![services::worlds::locations::get_location])
+        .mount("/", routes![services::worlds::locations::delete_location])
+        .mount("/", routes![services::worlds::locations::create_location])
+        .mount("/", routes![services::worlds::locations::update_location])
         .attach(Template::fairing())
 }
 
