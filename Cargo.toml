@@ -2,6 +2,12 @@
 name = "gamemstr-api"
 version = "0.1.0"
 edition = "2021"
+description = "API for the gamemstr project"
+authors = ["James Wolff <james.wolff0@gmail.com>"]
+homepage = "https://github.com/gamemstr/gamemstr-api"
+repository = "https://github.com/gamemstr/gamemstr-api"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
