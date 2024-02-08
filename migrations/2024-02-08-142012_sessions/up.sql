@@ -1,4 +1,3 @@
--- Your SQL goes here
 CREATE TABLE sessions (
   id VARCHAR PRIMARY KEY,
   name VARCHAR NOT NULL,
