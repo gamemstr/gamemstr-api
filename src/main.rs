@@ -1,3 +1,4 @@
+#![cfg_attr(debug_assertions, allow(unused_imports))]
 pub mod models;
 pub mod schema;
 mod services;
