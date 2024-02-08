@@ -13,6 +13,7 @@ use rocket::{
 };
 use rocket_dyn_templates::{context, Template};
 
+pub mod campaigns;
 pub mod locations;
 
 #[get("/worlds")]
