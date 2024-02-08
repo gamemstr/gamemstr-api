@@ -33,6 +33,11 @@ fn rocket() -> _ {
         .mount("/", routes![services::worlds::locations::delete_location])
         .mount("/", routes![services::worlds::locations::create_location])
         .mount("/", routes![services::worlds::locations::update_location])
+        .mount("/", routes![services::worlds::campaigns::sessions::list_sessions])
+        .mount("/", routes![services::worlds::campaigns::sessions::get_session])
+        .mount("/", routes![services::worlds::campaigns::sessions::delete_session])
+        .mount("/", routes![services::worlds::campaigns::sessions::create_session])
+        .mount("/", routes![services::worlds::campaigns::sessions::update_session])
         .attach(Template::fairing())
 }
 
@@ -395,5 +400,71 @@ mod tests {
             .dispatch();
         assert_eq!(response.status(), Status::Ok);
         client.delete("/worlds/2587598027928569265").dispatch();
+    }
+
+    #[test]
+    #[should_panic]
+    pub fn test_sessions_api() {
+        let client = Client::tracked(crate::rocket()).expect("valid rocket instance");
+        let world = gamemstr_common::world::World {
+            id: "2587598027928569265".to_string(),
+            name: "Test World".to_string(),
+            description: "Test Description".to_string(),
+        };
+        client
+            .post("/worlds/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&world).unwrap())
+            .dispatch();
+        // TODO: Add campaign
+        let response = client
+            .get("/worlds/2587598027928569265/campaigns/2587598027928569265/sessions")
+            .dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert!(response.into_string().unwrap().contains("Sessions"));
+        let session = gamemstr_common::world::campaign::session::Session {
+            id: "2587598027928569265".to_string(),
+            name: "Test World".to_string(),
+            description: "Test Description".to_string(),
+            campaign_id: "2587598027928569265".to_string(),
+            notes: vec![],
+            plan: gamemstr_common::world::campaign::session::Plan::default(),
+            recap: gamemstr_common::world::campaign::session::Recap::default(),
+        };
+        client
+            .post("/worlds/2587598027928569265/campaigns/2587598027928569265/sessions/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&session).unwrap())
+            .dispatch();
+        let response = client
+            .get("/worlds/2587598027928569265/campaigns/2587598027928569265/sessions/2587598027928569265")
+            .dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert_eq!(
+            response.into_string(),
+            Some(serde_json::to_string(&session).unwrap())
+        );
+        let new_session = gamemstr_common::world::campaign::session::Session {
+            name: "Updated Session".to_string(),
+            ..session
+        };
+        let response = client
+            .post("/worlds/2587598027928569265/campaigns/2587598027928569265/sessions/2587598027928569265")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&new_session).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Accepted);
+        assert_eq!(
+            serde_json::from_str::<gamemstr_common::world::campaign::session::Session>(
+                &response.into_string().unwrap()
+            )
+            .unwrap()
+            .name,
+            "Updated Session"
+        );
+        let response = client
+            .delete("/worlds/2587598027928569265/campaigns/2587598027928569265/sessions/2587598027928569265")
+            .dispatch();
+        assert_eq!(response.status(), Status::Ok);
     }
 }
