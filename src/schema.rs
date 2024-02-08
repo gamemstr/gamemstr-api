@@ -57,6 +57,18 @@ diesel::table! {
 }
 
 diesel::table! {
+    sessions (id) {
+        id -> Varchar,
+        name -> Varchar,
+        description -> Varchar,
+        campaign_id -> Varchar,
+        notes -> Jsonb,
+        plan -> Jsonb,
+        recap -> Jsonb,
+    }
+}
+
+diesel::table! {
     spells (id) {
         id -> Varchar,
         name -> Varchar,
@@ -82,4 +94,11 @@ diesel::table! {
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(creatures, items, locations, spells, worlds,);
+diesel::allow_tables_to_appear_in_same_query!(
+    creatures,
+    items,
+    locations,
+    sessions,
+    spells,
+    worlds,
+);

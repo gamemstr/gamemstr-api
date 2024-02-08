@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Sessions</title>
+    </head>
+    <body>
+        <section id = "hello">
+            <h1>Sessions</h1>
+            {{#each sessions as |session|}}
+            <ul>
+                <li>ID: {{session.id}}</li>
+                <li>Name: {{session.name}}</li>
+                <li>Description: {{session.description}}</li>
+                <li>Campaign ID: {{session.campaign_id}}</li>
+                <li>Notes: {{session.notes}}</li>
+                <li>Plan: {{session.plan}}</li>
+                <li>Recap: {{session.recap}}</li>
+            </ul>
+            {{/each}}
+        </section>
+    </body>
+</html>

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::schema::worlds;
 
+pub mod campaigns;
 pub mod locations;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable, AsChangeset)]
