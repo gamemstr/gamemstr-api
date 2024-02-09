@@ -28,6 +28,11 @@ fn rocket() -> _ {
         .mount("/", routes![services::worlds::delete_world])
         .mount("/", routes![services::worlds::list_worlds])
         .mount("/", routes![services::worlds::update_world])
+        .mount("/", routes![services::worlds::campaigns::list_campaigns])
+        .mount("/", routes![services::worlds::campaigns::get_campaign])
+        .mount("/", routes![services::worlds::campaigns::delete_campaign])
+        .mount("/", routes![services::worlds::campaigns::create_campaign])
+        .mount("/", routes![services::worlds::campaigns::update_campaign])
         .mount("/", routes![services::worlds::locations::list_locations])
         .mount("/", routes![services::worlds::locations::get_location])
         .mount("/", routes![services::worlds::locations::delete_location])
@@ -334,6 +339,70 @@ mod tests {
     }
 
     #[test]
+    pub fn test_campaigns_api() {
+        let client = Client::tracked(crate::rocket()).expect("valid rocket instance");
+        let world = gamemstr_common::world::World {
+            id: "2587598027928569265".to_string(),
+            name: "Test World".to_string(),
+            description: "Test Description".to_string(),
+        };
+        client
+            .post("/worlds/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&world).unwrap())
+            .dispatch();
+        let response = client
+            .get("/worlds/2587598027928569265/campaigns")
+            .dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert!(response.into_string().unwrap().contains("Campaigns"));
+        let campaign = gamemstr_common::world::campaign::Campaign {
+            id: "258759802792856926525".to_string(),
+            name: "Test Campaign".to_string(),
+            description: "Test Description".to_string(),
+            world_id: "2587598027928569265".to_string(),
+            players: None,
+        };
+        let response = client
+            .post("/worlds/2587598027928569265/campaigns/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&campaign).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Created);
+        let response = client
+            .get("/worlds/2587598027928569265/campaigns/258759802792856926525")
+            .dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        assert_eq!(
+            response.into_string(),
+            Some(serde_json::to_string(&campaign).unwrap())
+        );
+        let new_campaign = gamemstr_common::world::campaign::Campaign {
+            name: "Updated Campaign".to_string(),
+            ..campaign
+        };
+        let response = client
+            .post("/worlds/2587598027928569265/campaigns/258759802792856926525")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&new_campaign).unwrap())
+            .dispatch();
+        assert_eq!(response.status(), Status::Accepted);
+        assert_eq!(
+            serde_json::from_str::<gamemstr_common::world::campaign::Campaign>(
+                &response.into_string().unwrap()
+            )
+            .unwrap()
+            .name,
+            "Updated Campaign"
+        );
+        let response = client
+            .delete("/worlds/2587598027928569265/campaigns/258759802792856926525")
+            .dispatch();
+        assert_eq!(response.status(), Status::Ok);
+        client.delete("/worlds/2587598027928569265").dispatch();
+    }
+
+    #[test]
     pub fn test_locations_api() {
         let client = Client::tracked(crate::rocket()).expect("valid rocket instance");
         let world = gamemstr_common::world::World {
@@ -403,7 +472,6 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     pub fn test_sessions_api() {
         let client = Client::tracked(crate::rocket()).expect("valid rocket instance");
         let world = gamemstr_common::world::World {
@@ -416,7 +484,18 @@ mod tests {
             .header(ContentType::JSON)
             .body(serde_json::to_string(&world).unwrap())
             .dispatch();
-        // TODO: Add campaign
+        let campaign = gamemstr_common::world::campaign::Campaign {
+            id: "2587598027928569265".to_string(),
+            name: "Test Campaign".to_string(),
+            description: "Test Description".to_string(),
+            world_id: "2587598027928569265".to_string(),
+            players: None,
+        };
+        client
+            .post("/worlds/2587598027928569265/campaigns/add")
+            .header(ContentType::JSON)
+            .body(serde_json::to_string(&campaign).unwrap())
+            .dispatch();
         let response = client
             .get("/worlds/2587598027928569265/campaigns/2587598027928569265/sessions")
             .dispatch();
@@ -466,5 +545,7 @@ mod tests {
             .delete("/worlds/2587598027928569265/campaigns/2587598027928569265/sessions/2587598027928569265")
             .dispatch();
         assert_eq!(response.status(), Status::Ok);
+        client.delete("/worlds/2587598027928569265/campaigns/2587598027928569265").dispatch();
+        client.delete("/worlds/2587598027928569265").dispatch();
     }
 }

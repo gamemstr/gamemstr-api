@@ -1,6 +1,16 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
+    campaigns (id) {
+        id -> Varchar,
+        name -> Varchar,
+        description -> Varchar,
+        world_id -> Varchar,
+        players -> Jsonb,
+    }
+}
+
+diesel::table! {
     creatures (id) {
         id -> Varchar,
         name -> Varchar,
@@ -60,8 +70,8 @@ diesel::table! {
     sessions (id) {
         id -> Varchar,
         name -> Varchar,
-        description -> Varchar,
         campaign_id -> Varchar,
+        description -> Varchar,
         notes -> Jsonb,
         plan -> Jsonb,
         recap -> Jsonb,
@@ -95,6 +105,7 @@ diesel::table! {
 }
 
 diesel::allow_tables_to_appear_in_same_query!(
+    campaigns,
     creatures,
     items,
     locations,
