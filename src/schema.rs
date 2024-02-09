@@ -70,8 +70,8 @@ diesel::table! {
     sessions (id) {
         id -> Varchar,
         name -> Varchar,
-        description -> Varchar,
         campaign_id -> Varchar,
+        description -> Varchar,
         notes -> Jsonb,
         plan -> Jsonb,
         recap -> Jsonb,
