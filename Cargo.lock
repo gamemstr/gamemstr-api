@@ -449,7 +449,7 @@ dependencies = [
 [[package]]
 name = "gamemstr-common"
 version = "0.2.0-alpha.2"
-source = "git+https://github.com/gamemstr/gamemstr-common.git?rev=7fd6025316fee770002ad789080c1c69464489e3#7fd6025316fee770002ad789080c1c69464489e3"
+source = "git+https://github.com/gamemstr/gamemstr-common.git?rev=eeb70ee8f9f4ec9decaf71d292ba8974fc3834b4#eeb70ee8f9f4ec9decaf71d292ba8974fc3834b4"
 dependencies = [
  "num-to-words",
  "serde",
