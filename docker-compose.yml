@@ -1,8 +1,10 @@
+# Poestgres docker service used for development
+
 services: 
   db:
     image: postgres
     restart: always
     environment:
-      POSTGRES_PASSWORD: 1234
+      - POSTGRES_PASSWORD=${DATABASE_PASS}
     ports:
       - 5432:5432
