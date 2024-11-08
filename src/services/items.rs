@@ -79,7 +79,7 @@ pub fn update_item(
         .set(models::items::Item::new(item.clone().0))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(Some(item)))),
+        Ok(_) => Either::Left(Ok(Accepted(item))),
         Err(_) => Either::Right(Ok(NotFound(format!("No item with id {}", id)))),
     }
 }

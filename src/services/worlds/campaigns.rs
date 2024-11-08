@@ -96,7 +96,7 @@ pub fn update_campaign(
         ))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(Some(campaign)))),
+        Ok(_) => Either::Left(Ok(Accepted(campaign))),
         Err(_) => Either::Right(Ok(NotFound(format!("Campaign not found with id {}", id)))),
     }
 }

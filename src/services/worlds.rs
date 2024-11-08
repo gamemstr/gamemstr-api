@@ -82,7 +82,7 @@ pub fn update_world(
         .set(models::worlds::World::new(world.clone().0))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(Some(world)))),
+        Ok(_) => Either::Left(Ok(Accepted(world))),
         Err(_) => Either::Right(Ok(NotFound(id))),
     }
 }

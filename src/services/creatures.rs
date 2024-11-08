@@ -78,7 +78,7 @@ pub fn update_creature(
         .set(&models::creatures::Creature::new(creature.clone().0))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(Some(creature)))),
+        Ok(_) => Either::Left(Ok(Accepted(creature))),
         Err(_) => Either::Right(Ok(NotFound(format!("Creature with id {} not found", id)))),
     }
 }

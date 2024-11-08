@@ -94,7 +94,7 @@ pub fn update_location(
         ))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(Some(location)))),
+        Ok(_) => Either::Left(Ok(Accepted(location))),
         Err(_) => Either::Right(Ok(NotFound(format!("Location not found with id {}", id)))),
     }
 }

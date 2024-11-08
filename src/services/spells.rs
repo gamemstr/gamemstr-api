@@ -79,7 +79,7 @@ pub fn update_spell(
         .set(models::spells::Spell::new(spell.clone().0))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(Some(spell)))),
+        Ok(_) => Either::Left(Ok(Accepted(spell))),
         Err(_) => Either::Right(Ok(NotFound(format!("No spell with id {}", id)))),
     }
 }

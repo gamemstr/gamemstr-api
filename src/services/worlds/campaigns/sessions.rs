@@ -95,7 +95,7 @@ pub fn update_session(
         .set(&new_session)
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(Some(session)))),
+        Ok(_) => Either::Left(Ok(Accepted(session))),
         Err(_) => Either::Right(Ok(NotFound(format!("Session not found with id {}", id)))),
     }
 }
