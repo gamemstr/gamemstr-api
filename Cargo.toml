@@ -15,7 +15,7 @@ license = "MIT OR Apache-2.0"
 custom_derive = "0.1.7"
 diesel = { version = "2.2.4", features = ["postgres", "postgres_backend", "r2d2", "serde_json"] }
 dotenvy = "0.15.6"
-gamemstr-common = { git = "https://github.com/gamemstr/gamemstr-common.git", rev="eeb70ee8f9f4ec9decaf71d292ba8974fc3834b4"}
+gamemstr-common = { git = "https://github.com/gamemstr/gamemstr-common.git", rev="42cf87cb88f46abfd6110d05b7caf5761a9fe5d3"}
 r2d2 = "0.8.10"
 r2d2-diesel = "1.0.0"
 rocket = { version = "0.5.1", features = ["json"] }
