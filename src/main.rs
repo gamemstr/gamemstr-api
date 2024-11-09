@@ -60,21 +60,21 @@ mod tests {
         let response = client.get("/creatures").dispatch();
         assert_eq!(response.status(), Status::Ok);
         assert!(response.into_string().unwrap().contains("Creatures"));
-        let creature = gamemstr_common::creature::Creature {
-            id: "258759802792856926525".to_string(),
-            name: "Test Creature".to_string(),
-            creature_type: gamemstr_common::creature::CreatureType::NPC,
-            alignment: gamemstr_common::Alignment::ChaoticGood,
-            armor_class: 10,
-            health_points: gamemstr_common::creature::Health {
+        let creature = gamemstr_common::creature::Creature::new(
+            "258759802792856926525".to_string(),
+            "Test Creature".to_string(),
+            gamemstr_common::creature::CreatureType::NPC,
+            gamemstr_common::Alignment::ChaoticGood,
+            10,
+            gamemstr_common::creature::Health {
                 health: gamemstr_common::DieStat {
                     die_count: 3,
                     die_type: gamemstr_common::Die::D6,
                     extra: 4,
                 },
             },
-            speed: gamemstr_common::creature::MovementSpeed::Walk(30),
-            stats: vec![
+            gamemstr_common::creature::MovementSpeed::Walk(30),
+            vec![
                 gamemstr_common::creature::Stat {
                     stat_type: gamemstr_common::creature::StatType::Strength,
                     value: 10,
@@ -106,18 +106,18 @@ mod tests {
                     modifier: 0,
                 },
             ],
-            saving_throws: None,
-            damage_vulnerabilities: None,
-            damage_resistances: None,
-            damage_immunities: None,
-            condition_immunities: None,
-            skills: None,
-            senses: None,
-            languages: None,
-            challenge_rating: "1".into(),
-            racial_traits: None,
-            description: None,
-            actions: Some(vec![action::Action::new(action::ActionType::Attack(
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            "1".into(),
+            None,
+            None,
+            Some(vec![action::Action::new(action::ActionType::Attack(
                 action::attack::Attack::MeleeWeaponAttack(action::attack::Melee {
                     name: "Test Attack".to_string(),
                     modifier: 3,
@@ -132,9 +132,9 @@ mod tests {
                     description: "Test Description".to_string(),
                 }),
             ))]),
-            lair: None,
-            others: None,
-        };
+            None,
+            None,
+        );
         let response = client
             .post("/creatures/add")
             .header(ContentType::JSON)
@@ -144,10 +144,8 @@ mod tests {
         let response = client.get("/creatures/258759802792856926525").dispatch();
         assert_eq!(response.status(), Status::Ok);
         assert!(response.into_string().unwrap().contains("Test Creature"));
-        let new_creature = gamemstr_common::creature::Creature {
-            name: "Updated Creature".to_string(),
-            ..creature
-        };
+        let mut new_creature = creature.clone();
+        new_creature.set_name("Updated Creature".to_string());
         let response = client
             .post("/creatures/258759802792856926525")
             .header(ContentType::JSON)
@@ -159,7 +157,7 @@ mod tests {
                 &response.into_string().unwrap()
             )
             .unwrap()
-            .name,
+            .name(),
             "Updated Creature"
         );
         let response = client.delete("/creatures/258759802792856926525").dispatch();
