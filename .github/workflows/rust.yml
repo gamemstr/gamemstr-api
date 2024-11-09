@@ -15,13 +15,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install latest rust stable
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         override: true
         profile: minimal
+    - name: Clean
+      run: cargo clean
     - name: Build
       run: cargo build --verbose
   test:
@@ -50,6 +52,8 @@ jobs:
         toolchain: stable
         override: true
         profile: minimal
+    - name: Clean
+      run: cargo clean
     - name: Diesel Migrations
       run: cargo install diesel_cli --no-default-features -F postgres && diesel migration run
     - name: Run tests
