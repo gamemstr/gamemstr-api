@@ -55,6 +55,6 @@ jobs:
     - name: Clean
       run: cargo clean
     - name: Diesel Migrations
-      run: cargo install diesel_cli --no-default-features -F postgres && diesel migration run
+      run: cp .env.example .env && cargo install diesel_cli --no-default-features -F postgres && diesel migration run
     - name: Run tests
       run: cargo test --verbose
