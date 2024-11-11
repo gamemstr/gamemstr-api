@@ -1,4 +1,3 @@
-use super::super::Result;
 use crate::{
     models::{self, Model},
     schema,
@@ -7,9 +6,8 @@ use diesel::prelude::*;
 use gamemstr_common::world::location::Location;
 use rocket::{
     delete, get, post,
-    response::status::{Accepted, Created, NotFound},
+    response::status::{Accepted, BadRequest, Created, NotFound},
     serde::json::Json,
-    Either,
 };
 use rocket_dyn_templates::{context, Template};
 
@@ -33,28 +31,35 @@ pub fn list_locations(id: String) -> Template {
 }
 
 #[get("/worlds/<_world_id>/locations/<id>")]
-pub fn get_location(_world_id: String, id: String) -> Result<Json<Location>> {
+pub fn get_location(_world_id: String, id: String) -> Result<Json<Location>, NotFound<String>> {
     let connection = &mut super::super::establish_connection_pg();
     let location = schema::locations::dsl::locations
         .find(id)
-        .first::<models::worlds::locations::Location>(connection)
-        .expect("Error loading location")
-        .to_entity();
-    Ok(Json(location))
+        .first::<models::worlds::locations::Location>(connection);
+    
+    match location {
+        Ok(location) => Ok(Json(location.to_entity())),
+        Err(e) => Err(NotFound(e.to_string())),
+    }
 }
 
 #[delete("/worlds/<_world_id>/locations/<id>")]
-pub fn delete_location(_world_id: String, id: String) -> Result<Json<Location>> {
+pub fn delete_location(_world_id: String, id: String) -> Result<Json<Location>, NotFound<String>> {
     let connection = &mut super::super::establish_connection_pg();
     let location = schema::locations::dsl::locations
         .find(&id)
-        .first::<models::worlds::locations::Location>(connection)
-        .expect("Error loading location")
-        .to_entity();
-    diesel::delete(schema::locations::dsl::locations.find(&id))
-        .execute(connection)
-        .expect("Error deleting location");
-    Ok(Json(location))
+        .first::<models::worlds::locations::Location>(connection);
+    let result = diesel::delete(schema::locations::dsl::locations.find(&id))
+        .execute(connection);
+    match result {
+        Ok(_) => {
+            match location {
+                Ok(location) => Ok(Json(location.to_entity())),
+                Err(e) => Err(NotFound(e.to_string())),
+            }
+        },
+        Err(e) => Err(NotFound(e.to_string())),
+    }
 }
 
 #[post(
@@ -66,14 +71,17 @@ pub fn delete_location(_world_id: String, id: String) -> Result<Json<Location>> 
 pub fn create_location(
     _world_id: String,
     location: Json<Location>,
-) -> Result<Created<Json<Location>>> {
+) -> Result<Created<Json<Location>>, BadRequest<String>> {
     let connection = &mut super::super::establish_connection_pg();
     let new_location = models::worlds::locations::Location::new(location.clone().0);
-    diesel::insert_into(schema::locations::dsl::locations)
+    let result = diesel::insert_into(schema::locations::dsl::locations)
         .values(&new_location)
-        .execute(connection)
-        .expect("Error creating location");
-    Ok(Created::new("/").body(location))
+        .execute(connection);
+    
+    match result {
+        Ok(_) => Ok(Created::new(format!("/locations/{}", new_location.id)).body(location)),
+        Err(e) => Err(BadRequest(e.to_string())),
+    }
 }
 
 #[post(
@@ -86,7 +94,7 @@ pub fn update_location(
     _world_id: String,
     id: String,
     location: Json<Location>,
-) -> Either<Result<Accepted<Json<Location>>>, Result<NotFound<String>>> {
+) -> Result<Accepted<Json<Location>>, NotFound<String>> {
     let connection = &mut super::super::establish_connection_pg();
     let result = diesel::update(schema::locations::dsl::locations.find(&id))
         .set(&models::worlds::locations::Location::new(
@@ -94,7 +102,7 @@ pub fn update_location(
         ))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(location))),
-        Err(_) => Either::Right(Ok(NotFound(format!("Location not found with id {}", id)))),
+        Ok(_) => Ok(Accepted(location)),
+        Err(e) => Err(NotFound(e.to_string())),
     }
 }

@@ -7,7 +7,8 @@ extern crate rocket;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenvy::dotenv;
-use rocket::response::Debug;
+use rocket::response::status::NotFound;
+use rocket::response::Responder;
 use std::env;
 
 pub fn establish_connection_pg() -> PgConnection {
@@ -16,5 +17,3 @@ pub fn establish_connection_pg() -> PgConnection {
     PgConnection::establish(&database_url)
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
-
-pub type Result<T, E = Debug<diesel::result::Error>> = std::result::Result<T, E>;

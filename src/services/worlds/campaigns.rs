@@ -1,15 +1,13 @@
 use crate::{
     models::{self, Model},
     schema,
-    services::Result,
 };
 use diesel::prelude::*;
 use gamemstr_common::world::campaign::Campaign;
 use rocket::{
     delete, get, post,
-    response::status::{Accepted, Created, NotFound},
+    response::status::{Accepted, BadRequest, Created, NotFound},
     serde::json::Json,
-    Either,
 };
 use rocket_dyn_templates::{context, Template};
 
@@ -35,47 +33,55 @@ pub fn list_campaigns(id: String) -> Template {
 }
 
 #[get("/worlds/<_world_id>/campaigns/<id>")]
-pub fn get_campaign(_world_id: String, id: String) -> Result<Json<Campaign>> {
+pub fn get_campaign(_world_id: String, id: String) -> Result<Json<Campaign>, NotFound<String>> {
     let connection = &mut super::super::establish_connection_pg();
     let campaign = schema::campaigns::dsl::campaigns
         .find(id)
-        .first::<models::worlds::campaigns::Campaign>(connection)
-        .expect("Error loading campaign")
-        .to_entity();
-    Ok(Json(campaign))
+        .first::<models::worlds::campaigns::Campaign>(connection);
+    match campaign {
+        Ok(campaign) => Ok(Json(campaign.to_entity())),
+        Err(e) => Err(NotFound(e.to_string())),
+    }
 }
 
 #[delete("/worlds/<_world_id>/campaigns/<id>")]
-pub fn delete_campaign(_world_id: String, id: String) -> Result<Json<Campaign>> {
+pub fn delete_campaign(_world_id: String, id: String) -> Result<Json<Campaign>, NotFound<String>> {
     let connection = &mut super::super::establish_connection_pg();
     let campaign = schema::campaigns::dsl::campaigns
         .find(&id)
-        .first::<models::worlds::campaigns::Campaign>(connection)
-        .expect("Error loading campaign")
-        .to_entity();
-    diesel::delete(schema::campaigns::dsl::campaigns.find(&id))
-        .execute(connection)
-        .expect("Error deleting campaign");
-    Ok(Json(campaign))
+        .first::<models::worlds::campaigns::Campaign>(connection);
+    let result = diesel::delete(schema::campaigns::dsl::campaigns.find(&id))
+        .execute(connection);
+    match result {
+        Ok(_) => {
+            match campaign {
+                Ok(campaign) => Ok(Json(campaign.to_entity())),
+                Err(e) => Err(NotFound(e.to_string())),
+            }
+        }
+        Err(e) => Err(NotFound(e.to_string())),
+    }
 }
 
 #[post(
-    "/worlds/<_world_id>/campaigns/add",
+    "/worlds/<world_id>/campaigns/add",
     rank = 1,
     format = "json",
     data = "<campaign>"
 )]
 pub fn create_campaign(
-    _world_id: String,
+    world_id: String,
     campaign: Json<Campaign>,
-) -> Result<Created<Json<Campaign>>> {
+) -> Result<Created<Json<Campaign>>, BadRequest<String>> {
     let connection = &mut super::super::establish_connection_pg();
     let new_campaign = models::worlds::campaigns::Campaign::new(campaign.clone().0);
-    diesel::insert_into(schema::campaigns::dsl::campaigns)
+    let result = diesel::insert_into(schema::campaigns::dsl::campaigns)
         .values(&new_campaign)
-        .execute(connection)
-        .expect("Error creating campaign");
-    Ok(Created::new("/").body(campaign))
+        .execute(connection);
+    match result {
+        Ok(_) => Ok(Created::new(format!("/worlds/{}/campaigns/{}", world_id, new_campaign.id)).body(campaign)),
+        Err(e) => Err(BadRequest(e.to_string())),
+    }
 }
 
 #[post(
@@ -88,7 +94,7 @@ pub fn update_campaign(
     _world_id: String,
     id: String,
     campaign: Json<Campaign>,
-) -> Either<Result<Accepted<Json<Campaign>>>, Result<NotFound<String>>> {
+) -> Result<Accepted<Json<Campaign>>, NotFound<String>> {
     let connection = &mut super::super::establish_connection_pg();
     let result = diesel::update(schema::campaigns::dsl::campaigns.find(&id))
         .set(&models::worlds::campaigns::Campaign::new(
@@ -96,7 +102,7 @@ pub fn update_campaign(
         ))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(campaign))),
-        Err(_) => Either::Right(Ok(NotFound(format!("Campaign not found with id {}", id)))),
+        Ok(_) => Ok(Accepted(campaign)),
+        Err(e) => Err(NotFound(e.to_string())),
     }
 }

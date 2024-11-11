@@ -1,15 +1,15 @@
-use super::Result;
+use std::f64::consts::E;
+
 use crate::{
     models::{self, Model},
     schema,
 };
 use diesel::prelude::*;
 use gamemstr_common::world::World;
-use rocket::serde::json::Json;
-use rocket::{delete, get, post};
 use rocket::{
-    response::status::{Accepted, Created, NotFound},
-    Either,
+    delete, get, post,
+    response::status::{Accepted, BadRequest, Created, NotFound},
+    serde::json::Json,
 };
 use rocket_dyn_templates::{context, Template};
 
@@ -35,54 +35,66 @@ pub fn list_worlds() -> Template {
 }
 
 #[get("/worlds/<id>")]
-pub fn get_world(id: String) -> Result<Json<World>> {
+pub fn get_world(id: String) -> Result<Json<World>, NotFound<String>> {
     let connection = &mut super::establish_connection_pg();
     let world = schema::worlds::dsl::worlds
         .find(id)
-        .first::<models::worlds::World>(connection)
-        .expect("Error loading world")
-        .to_entity();
-    Ok(Json(world))
+        .first::<models::worlds::World>(connection);
+    match world {
+        Ok(world) => Ok(Json(world.to_entity())),
+        Err(e) => Err(NotFound(e.to_string())),
+        
+    }
 }
 
 #[delete("/worlds/<id>")]
-pub fn delete_world(id: String) -> Result<Json<World>> {
+pub fn delete_world(id: String) -> Result<Json<World>, NotFound<String>> {
     let connection = &mut super::establish_connection_pg();
     let world = schema::worlds::dsl::worlds
         .find(&id)
-        .first::<models::worlds::World>(connection)
-        .expect("Error loading world")
-        .to_entity();
-    diesel::delete(schema::worlds::dsl::worlds.find(&id))
-        .execute(connection)
-        .expect("Error deleting world");
-    Ok(Json(world))
+        .first::<models::worlds::World>(connection);
+
+    let result = diesel::delete(schema::worlds::dsl::worlds.find(&id))
+        .execute(connection);
+    
+    match result {
+        Ok(_) => {
+            match world {
+                Ok(world) => Ok(Json(world.to_entity())),
+                Err(e) => Err(NotFound(e.to_string())),
+            }
+        },
+        Err(e) => Err(NotFound(e.to_string())),
+    }
 }
 
 #[post("/worlds/add", format = "json", data = "<world>")]
-pub fn create_world(world: Json<World>) -> Result<Created<Json<World>>> {
+pub fn create_world(world: Json<World>) -> Result<Created<Json<World>>, BadRequest<String>> {
     let connection = &mut super::establish_connection_pg();
 
     let new_world = models::worlds::World::new(world.clone().0);
 
-    diesel::insert_into(schema::worlds::dsl::worlds)
+    let result = diesel::insert_into(schema::worlds::dsl::worlds)
         .values(&new_world)
-        .execute(connection)
-        .expect("Error saving new world");
-    Ok(Created::new("/").body(world))
+        .execute(connection);
+    
+    match result {
+        Ok(_) => Ok(Created::new(format!("/worlds/{}", new_world.id)).body(world)),
+        Err(e) => Err(BadRequest(e.to_string())),
+    }
 }
 
 #[post("/worlds/<id>", format = "json", data = "<world>")]
 pub fn update_world(
     id: String,
     world: Json<World>,
-) -> Either<Result<Accepted<Json<World>>>, Result<NotFound<String>>> {
+) -> Result<Accepted<Json<World>>, NotFound<String>> {
     let connection = &mut super::establish_connection_pg();
     let result = diesel::update(schema::worlds::dsl::worlds.find(&id))
         .set(models::worlds::World::new(world.clone().0))
         .execute(connection);
     match result {
-        Ok(_) => Either::Left(Ok(Accepted(world))),
-        Err(_) => Either::Right(Ok(NotFound(id))),
+        Ok(_) => Ok(Accepted(world)),
+        Err(e) => Err(NotFound(e.to_string())),
     }
 }
